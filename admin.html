@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Boat Marketplace</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; background: #eff6ff; font-family: 'DM Sans', sans-serif; color: #1d3c6c; }
+
+  #ocean-bg { position: fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+
+  /* Nav */
+  .nav-bar { display:flex; justify-content:center; gap:10px; padding:1.5rem 1rem 0; position:relative; z-index:10; flex-wrap:wrap; }
+  .nav-pill { font-size:12px; font-weight:500; padding:7px 18px; border-radius:20px; border:1px solid rgba(92,145,211,0.3); background:rgba(230,242,255,0.85); color:#2a5080; cursor:pointer; text-decoration:none; letter-spacing:0.04em; transition:all 0.18s; }
+  .nav-pill:hover { background:#d6e8ff; border-color:#3b79cf; }
+  .nav-pill.active-nav { background:#1e4a7c; color:#fff; border-color:#1e4a7c; }
+  .nav-pill.logout { background:rgba(226,75,74,0.08); border-color:rgba(226,75,74,0.3); color:#b83232; }
+  .nav-pill.logout:hover { background:rgba(226,75,74,0.15); }
+
+  .page-wrap { width:min(100%,1080px); margin:2rem auto; padding:0 1rem 3rem; position:relative; z-index:2; }
+
+  /* Admin header */
+  .admin-header {
+    background: linear-gradient(135deg, #122c51 0%, #1e4a7c 60%, #2a5c96 100%);
+    border-radius: 24px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 1.8rem;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(18,44,81,0.2);
+  }
+  .admin-header::after {
+    content: '⚓';
+    position: absolute;
+    right: 2rem; top: 50%;
+    transform: translateY(-50%);
+    font-size: 5rem;
+    opacity: 0.07;
+  }
+  .admin-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 3px 12px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #c8e8f4;
+    margin-bottom: 0.8rem;
+  }
+  .admin-header h1 { font-family:'Playfair Display',serif; font-size:2rem; font-weight:600; margin-bottom:0.3rem; }
+  .admin-header p { font-size:13px; color:rgba(200,232,244,0.75); }
+
+  /* Stats strip */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 1.8rem;
+  }
+  .stat-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid rgba(94,146,215,0.14);
+    box-shadow: 0 6px 20px rgba(29,56,104,0.06);
+    padding: 1.2rem;
+    text-align: center;
+  }
+  .stat-card .num { font-family:'Playfair Display',serif; font-size:1.6rem; color:#122c51; font-weight:600; }
+  .stat-card .lbl { font-size:11px; color:#7a9ab8; margin-top:2px; }
+
+  /* Tabs */
+  .tab-row { display:flex; gap:6px; margin-bottom:1.5rem; border-bottom:1px solid rgba(126,200,227,0.18); }
+  .tab-btn { padding:9px 20px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; color:#4a7bb7; background:transparent; border:none; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all 0.18s; }
+  .tab-btn.active { color:#122c51; border-bottom-color:#1e4a7c; }
+  .tab-btn:hover { color:#122c51; }
+
+  /* Table */
+  .table-wrap { background:#fff; border-radius:20px; border:1px solid rgba(94,146,215,0.14); box-shadow:0 8px 24px rgba(29,56,104,0.06); overflow:hidden; }
+  table { width:100%; border-collapse:collapse; }
+  thead tr { background:linear-gradient(90deg,#f0f6ff,#e8f2ff); }
+  th { padding:12px 14px; font-size:11px; font-weight:600; color:#4a7bb7; letter-spacing:0.08em; text-transform:uppercase; text-align:left; border-bottom:1px solid rgba(126,200,227,0.18); white-space:nowrap; }
+  td { padding:12px 14px; font-size:13px; color:#1f3b68; border-bottom:1px solid rgba(126,200,227,0.08); vertical-align:middle; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:rgba(230,242,255,0.4); }
+
+  .pill {
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:10px;
+    font-size:11px;
+    font-weight:500;
+    background:rgba(88,138,219,0.1);
+    border:1px solid rgba(88,138,219,0.2);
+    color:#2a5080;
+  }
+  .pill.buyer { background:rgba(59,121,207,0.09); border-color:rgba(59,121,207,0.22); color:#154a82; }
+
+  .action-btns { display:flex; gap:6px; }
+  .btn-edit {
+    background:#e5f0ff; color:#154a82; border:1px solid rgba(92,145,211,0.4);
+    border-radius:8px; padding:5px 12px; font-family:'DM Sans',sans-serif;
+    font-size:12px; font-weight:500; cursor:pointer; transition:all 0.18s; white-space:nowrap;
+  }
+  .btn-edit:hover { background:#d6e8ff; border-color:#3b79cf; }
+  .btn-delete {
+    background:rgba(226,75,74,0.08); color:#b83232; border:1px solid rgba(226,75,74,0.25);
+    border-radius:8px; padding:5px 12px; font-family:'DM Sans',sans-serif;
+    font-size:12px; cursor:pointer; transition:all 0.18s; white-space:nowrap;
+  }
+  .btn-delete:hover { background:rgba(226,75,74,0.15); }
+
+  .empty-row td { text-align:center; padding:3rem; color:#7a9ab8; font-size:13px; }
+
+  /* Modal */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(18,44,81,0.4); z-index:100; align-items:center; justify-content:center; padding:1rem; overflow-y:auto; }
+  .modal-overlay.open { display:flex; }
+  .modal {
+    background:#fff; border-radius:24px; padding:2rem 2.2rem; max-width:600px; width:100%;
+    box-shadow:0 30px 80px rgba(18,44,81,0.18); animation:fadeSlide 0.3s ease forwards;
+    margin:auto; max-height:90vh; overflow-y:auto;
+  }
+  @keyframes fadeSlide { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
+  .modal-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem; }
+  .modal-header h3 { font-family:'Playfair Display',serif; font-size:1.35rem; color:#122c51; }
+  .modal-close { background:none; border:none; font-size:20px; cursor:pointer; color:#7a9ab8; transition:color 0.15s; }
+  .modal-close:hover { color:#122c51; }
+
+  .edit-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .edit-grid .full { grid-column:1/-1; }
+
+  .field-group { margin-bottom:0; }
+  label.fl { display:block; font-size:11px; font-weight:500; color:#415b7d; margin-bottom:4px; letter-spacing:0.04em; }
+  input[type=text], input[type=number], input[type=email], input[type=tel], select, textarea {
+    width:100%; background:#f6f9ff; border:1px solid rgba(92,145,211,0.35);
+    border-radius:8px; padding:9px 12px; font-family:'DM Sans',sans-serif;
+    font-size:13px; color:#1f3b68; outline:none; transition:border-color 0.2s;
+  }
+  input:focus, select:focus, textarea:focus { border-color:rgba(92,145,211,0.7); background:#eef4ff; }
+  textarea { resize:vertical; min-height:70px; line-height:1.5; }
+
+  .modal-footer { display:flex; gap:10px; justify-content:flex-end; margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid rgba(126,200,227,0.15); }
+  .btn-save { background:#1e4a7c; color:#fff; border:none; border-radius:10px; padding:10px 24px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.18s; }
+  .btn-save:hover { background:#122c51; transform:translateY(-1px); }
+  .btn-cancel { background:transparent; border:1px solid rgba(92,145,211,0.3); color:#4a7bb7; border-radius:10px; padding:10px 18px; font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; transition:all 0.18s; }
+  .btn-cancel:hover { background:rgba(92,145,211,0.07); }
+
+  /* Confirm delete */
+  .confirm-box { background:#fff; border-radius:20px; padding:2rem; max-width:360px; width:100%; box-shadow:0 24px 60px rgba(18,44,81,0.18); text-align:center; animation:fadeSlide 0.25s ease forwards; margin:auto; }
+  .confirm-box h3 { font-family:'Playfair Display',serif; color:#122c51; margin-bottom:0.5rem; }
+  .confirm-box p { font-size:13px; color:#5b738f; margin-bottom:1.5rem; line-height:1.5; }
+  .confirm-btns { display:flex; gap:10px; justify-content:center; }
+  .btn-confirm-del { background:#e24b4a; color:#fff; border:none; border-radius:10px; padding:10px 22px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; }
+  .btn-confirm-del:hover { background:#c73a39; }
+
+  /* Toast */
+  .toast { position:fixed; bottom:2rem; right:2rem; z-index:200; background:#122c51; color:#c8e8f4; border-radius:12px; padding:12px 20px; font-size:13px; box-shadow:0 8px 24px rgba(18,44,81,0.25); transform:translateY(80px); opacity:0; transition:all 0.3s; pointer-events:none; }
+  .toast.show { transform:translateY(0); opacity:1; }
+
+  @media(max-width:600px){
+    .edit-grid { grid-template-columns:1fr; }
+    .edit-grid .full { grid-column:1; }
+    table { font-size:12px; }
+    th, td { padding:10px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="ocean-bg"></canvas>
+<script>
+// Auth guard
+try {
+  if (localStorage.getItem('boatMarketRole') !== 'admin' || localStorage.getItem('boatMarketAuth') !== 'true') {
+    window.location.href = 'login.html';
+  }
+} catch(e) { window.location.href = 'login.html'; }
+</script>
+
+<script>
+(function(){
+  var canvas=document.getElementById('ocean-bg');
+  var ctx=canvas.getContext('2d');
+  var W,H;
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  var t=0;
+  function waveY(x,time,amp,freq,speed){return amp*Math.sin(freq*x+speed*time);}
+  function drawWaves(){
+    [[0.72,14,0.012,1.1,6,0.028,0.7,'rgba(126,185,230,0.22)','rgba(100,160,220,0.12)',0.6],
+     [0.78,10,0.018,-0.9,5,0.035,1.3,'rgba(100,165,220,0.18)','rgba(80,145,210,0.10)',0.7],
+     [0.84,8,0.022,1.5,4,0.04,-0.6,'rgba(80,155,215,0.20)','rgba(60,130,200,0.10)',0.78]
+    ].forEach(function(w){
+      ctx.beginPath();ctx.moveTo(0,H);
+      for(var x=0;x<=W;x+=4){ctx.lineTo(x,H*w[0]+waveY(x,t,w[1],w[2],w[3])+waveY(x,t,w[4],w[5],w[6]));}
+      ctx.lineTo(W,H);ctx.closePath();
+      var g=ctx.createLinearGradient(0,H*w[10],0,H);g.addColorStop(0,w[7]);g.addColorStop(1,w[8]);
+      ctx.fillStyle=g;ctx.fill();
+    });
+  }
+  function animate(){ctx.clearRect(0,0,W,H);t+=0.018;drawWaves();requestAnimationFrame(animate);}
+  animate();
+})();
+</script>
+
+<!-- Nav -->
+<div class="nav-bar">
+  <a class="nav-pill" href="seller.html">Sell a Boat</a>
+  <a class="nav-pill" href="buyer.html">Find a Boat</a>
+  <a class="nav-pill" href="listings.html">Browse Listings</a>
+  <a class="nav-pill active-nav" href="admin.html">⚓ Admin</a>
+  <a class="nav-pill logout" href="#" onclick="logout()">Sign Out</a>
+</div>
+
+<div class="page-wrap">
+  <!-- Header -->
+  <div class="admin-header">
+    <div class="admin-tag">Admin Panel</div>
+    <h1>Marketplace Dashboard</h1>
+    <p>View, edit, and delete all seller listings and buyer requests.</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-strip">
+    <div class="stat-card"><div class="num" id="st-sellers">—</div><div class="lbl">Seller Listings</div></div>
+    <div class="stat-card"><div class="num" id="st-buyers">—</div><div class="lbl">Buyer Requests</div></div>
+    <div class="stat-card"><div class="num" id="st-total">—</div><div class="lbl">Total Records</div></div>
+    <div class="stat-card"><div class="num" id="st-new">—</div><div class="lbl">New (48 hrs)</div></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-row">
+    <button class="tab-btn active" id="tab-s" onclick="showTab('sellers')">Seller Listings</button>
+    <button class="tab-btn" id="tab-b" onclick="showTab('buyers')">Buyer Requests</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table id="main-table">
+      <thead id="table-head"></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="overlayClick(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-title">Edit Listing</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modal-form"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="del-overlay" onclick="overlayClick(event)">
+  <div class="confirm-box">
+    <h3>Delete this record?</h3>
+    <p id="del-desc">This action cannot be undone.</p>
+    <div class="confirm-btns">
+      <button class="btn-cancel" onclick="document.getElementById('del-overlay').classList.remove('open')">Cancel</button>
+      <button class="btn-confirm-del" id="del-confirm-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Demo data (same as listings.html) ──
+var DEMO_SELLERS = [
+  {type:'seller',id:'s1',boatType:'Center Console',make:'Boston Whaler',model:'Outrage 280',year:2020,length:28,beam:9.5,hull:'Fiberglass',color:'White / blue stripe',trailer:'No trailer',engines:'Twin',engBrand:'Mercury',hp:600,engYear:2020,engHours:312,engType:'Outboard',electronics:['Garmin GPS','Fish Finder','VHF Radio','Radar','Chartplotter'],amenities:['Bimini Top','Swim Platform','Anchor & Windlass','Rod Holders'],price:189000,location:'Fort Lauderdale, FL',storage:'Marina / Slip',title:'Clean title in hand',reason:'Upgrading',notes:'Excellent offshore fishing machine. Full Garmin suite, T-top, live well.',contactFirst:'Michael',contactLast:'Torres',contactEmail:'m.torres@example.com',contactPhone:'(954) 555-0192',contactPref:'Call',submittedAt:new Date(Date.now()-86400000*1).toISOString()},
+  {type:'seller',id:'s2',boatType:'Pontoon',make:'Bennington',model:'22 SSRX',year:2021,length:22,beam:8,hull:'Aluminum',color:'Champagne / grey deck',trailer:'Yes, included',engines:'Single',engBrand:'Yamaha',hp:150,engYear:2021,engHours:180,engType:'Outboard',electronics:['Garmin GPS','Stereo / Sound System','Depth Sounder'],amenities:['Bimini Top','Swim Platform','Boarding Ladder','Cooler / Fridge'],price:38500,location:'Lake Norman, NC',storage:'Freshwater Lake',title:'Clean title in hand',reason:'Moving out of state',notes:'Pristine freshwater boat. Never in salt.',contactFirst:'Sarah',contactLast:'Chen',contactEmail:'schen@example.com',contactPhone:'(704) 555-0341',contactPref:'Text',submittedAt:new Date(Date.now()-86400000*3).toISOString()},
+  {type:'seller',id:'s3',boatType:'Bass Boat',make:'Ranger',model:'Z521C',year:2019,length:21,beam:8,hull:'Fiberglass',color:'Black / silver',trailer:'Yes, included',engines:'Single',engBrand:'Mercury',hp:250,engYear:2019,engHours:445,engType:'Outboard',electronics:['Humminbird GPS','Fish Finder','Side Imaging Sonar','Down Imaging'],amenities:['Live Well','Rod Holders'],price:42000,location:'Guntersville, AL',storage:'Driveway / Home',title:'Clean title in hand',reason:'Health reasons',notes:'Tournament-ready. Dual Humminbird Helix setup.',contactFirst:'Jeff',contactLast:'Malone',contactEmail:'jmalone@example.com',contactPhone:'(256) 555-0087',contactPref:'Call',submittedAt:new Date(Date.now()-86400000*5).toISOString()},
+  {type:'seller',id:'s4',boatType:'Cabin Cruiser',make:'Sea Ray',model:'Sundancer 320',year:2017,length:32,beam:10,hull:'Fiberglass',color:'White / platinum',trailer:'No trailer',engines:'Twin',engBrand:'Mercruiser',hp:440,engYear:2017,engHours:720,engType:'Stern Drive (I/O)',electronics:['Garmin GPS','Chartplotter','VHF Radio','Autopilot','Radar'],amenities:['Cabin / Cuddy','Head / Bathroom','Galley / Kitchenette','Air Conditioning','Shore Power'],price:95000,location:'Annapolis, MD',storage:'Marina / Slip',title:'Clean title in hand',reason:'Upgrading',notes:'Meticulously maintained. Full service records.',contactFirst:'Patricia',contactLast:'Monroe',contactEmail:'pat.monroe@example.com',contactPhone:'(410) 555-0228',contactPref:'Email',submittedAt:new Date(Date.now()-86400000*7).toISOString()},
+  {type:'seller',id:'s5',boatType:'Bowrider',make:'Chaparral',model:'21 SSi',year:2022,length:21,beam:7.5,hull:'Fiberglass',color:'White / red accent',trailer:'Yes, included',engines:'Single',engBrand:'MerCruiser',hp:220,engYear:2022,engHours:95,engType:'Stern Drive (I/O)',electronics:['Depth Sounder','Stereo / Sound System'],amenities:['Bimini Top','Swim Platform','Boarding Ladder'],price:45000,location:'Austin, TX',storage:'Driveway / Home',title:'Clean title in hand',reason:'Upgrading to larger boat',notes:'Like new. Only used on Lake Travis.',contactFirst:'Ryan',contactLast:'Davis',contactEmail:'ryan.d@example.com',contactPhone:'(512) 555-0773',contactPref:'Text',submittedAt:new Date(Date.now()-86400000*2).toISOString()}
+];
+
+var DEMO_BUYERS = [
+  {type:'buyer',id:'b1',boatTypes:['Center Console','Offshore / Sport Fish'],make:'Boston Whaler, Grady-White',primaryUse:'Fishing',lenMin:24,lenMax:32,yrMin:2016,yrMax:2024,hullPrefs:['Fiberglass'],trailerReq:'No preference',engTypes:['Outboard'],hpMin:300,hpMax:600,hrsMax:500,engBrand:'',mustHaves:['GPS / Chartplotter','Fish Finder','VHF Radio'],priceMin:80000,priceMax:200000,finance:'Financing / loan',timeline:'1–3 months',firstName:'James',lastName:'K.',email:'james.k@example.com',phone:'(305) 555-0119',location:'Miami, FL',contactPref:'Email',notes:'Offshore tournament fishing. Must have T-top.',submittedAt:new Date(Date.now()-86400000*1).toISOString()},
+  {type:'buyer',id:'b2',boatTypes:['Pontoon','Tritoon'],make:'',primaryUse:'Family Fun',lenMin:20,lenMax:26,yrMin:2018,yrMax:2024,hullPrefs:['Aluminum'],trailerReq:'Preferred but not required',engTypes:['Outboard'],hpMin:100,hpMax:250,hrsMax:300,engBrand:'Yamaha',mustHaves:['Bimini Top','Swim Platform'],priceMin:30000,priceMax:65000,finance:'Paying cash',timeline:'Right now',firstName:'Lisa',lastName:'M.',email:'lisa.m@example.com',phone:'(312) 555-0284',location:'Lake Michigan, IL',contactPref:'Text',notes:'Family of 5. Freshwater use only.',submittedAt:new Date(Date.now()-86400000*2).toISOString()},
+  {type:'buyer',id:'b3',boatTypes:['Bass Boat'],make:'Ranger, Nitro, Skeeter',primaryUse:'Fishing',lenMin:18,lenMax:22,yrMin:2015,yrMax:2024,hullPrefs:['Fiberglass'],trailerReq:'Yes, must include trailer',engTypes:['Outboard'],hpMin:200,hpMax:300,hrsMax:600,engBrand:'',mustHaves:['Fish Finder','Live Well','Rod Holders'],priceMin:25000,priceMax:55000,finance:'Financing / loan',timeline:'1–3 months',firstName:'Tom',lastName:'B.',email:'tom.b@example.com',phone:'(615) 555-0347',location:'Tennessee',contactPref:'Call',notes:'Tournament bass angler. Will travel for the right boat.',submittedAt:new Date(Date.now()-86400000*4).toISOString()}
+];
+
+// Load data
+function getData() {
+  var sellers = DEMO_SELLERS.slice();
+  var buyers = DEMO_BUYERS.slice();
+  try {
+    var ls = JSON.parse(localStorage.getItem('boatSellerListings') || '[]');
+    ls.forEach(function(r,i){ if(!r.id) r.id='ls'+i; sellers.push(r); });
+    var lb = JSON.parse(localStorage.getItem('boatBuyerRequests') || '[]');
+    lb.forEach(function(r,i){ if(!r.id) r.id='lb'+i; buyers.push(r); });
+    // Load any admin edits
+    var edits = JSON.parse(localStorage.getItem('adminEdits') || '{}');
+    sellers = sellers.map(function(s){ return edits[s.id] ? Object.assign({}, s, edits[s.id]) : s; });
+    buyers = buyers.map(function(b){ return edits[b.id] ? Object.assign({}, b, edits[b.id]) : b; });
+    // Load deletions
+    var dels = JSON.parse(localStorage.getItem('adminDeleted') || '[]');
+    sellers = sellers.filter(function(s){ return dels.indexOf(s.id) < 0; });
+    buyers = buyers.filter(function(b){ return dels.indexOf(b.id) < 0; });
+  } catch(e){}
+  return { sellers: sellers, buyers: buyers };
+}
+
+var currentTab = 'sellers';
+var editingRecord = null;
+
+function updateStats() {
+  var d = getData();
+  var now = Date.now();
+  var newCount = d.sellers.concat(d.buyers).filter(function(r){
+    return (now - new Date(r.submittedAt).getTime()) < 86400000*2;
+  }).length;
+  document.getElementById('st-sellers').textContent = d.sellers.length;
+  document.getElementById('st-buyers').textContent = d.buyers.length;
+  document.getElementById('st-total').textContent = d.sellers.length + d.buyers.length;
+  document.getElementById('st-new').textContent = newCount;
+}
+
+function timeSince(iso) {
+  var ms = Date.now() - new Date(iso).getTime();
+  var days = Math.floor(ms/86400000);
+  if (days === 0) return 'Today';
+  if (days === 1) return '1d ago';
+  return days + 'd ago';
+}
+
+function fmt(n) { return n ? '$' + Number(n).toLocaleString() : '—'; }
+
+function showTab(tab) {
+  currentTab = tab;
+  document.getElementById('tab-s').classList.toggle('active', tab === 'sellers');
+  document.getElementById('tab-b').classList.toggle('active', tab === 'buyers');
+  renderTable();
+}
+
+function renderTable() {
+  var d = getData();
+  var head = document.getElementById('table-head');
+  var body = document.getElementById('table-body');
+
+  if (currentTab === 'sellers') {
+    head.innerHTML = '<tr><th>#</th><th>Type</th><th>Boat</th><th>Price</th><th>Location</th><th>Contact</th><th>HP / Hrs</th><th>Listed</th><th>Actions</th></tr>';
+    body.innerHTML = '';
+    if (d.sellers.length === 0) {
+      body.innerHTML = '<tr class="empty-row"><td colspan="9">No seller listings yet.</td></tr>';
+      return;
+    }
+    d.sellers.forEach(function(s, i) {
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td style="color:#7a9ab8;font-size:11px;">' + (i+1) + '</td>' +
+        '<td><span class="pill">' + (s.boatType||'—') + '</span></td>' +
+        '<td><strong style="color:#122c51;">' + (s.year||'') + ' ' + (s.make||'') + '</strong><br><span style="font-size:11px;color:#7a9ab8;">' + (s.model||'') + '</span></td>' +
+        '<td style="font-weight:500;">' + fmt(s.price) + '</td>' +
+        '<td style="font-size:12px;">' + (s.location||'—') + '</td>' +
+        '<td style="font-size:12px;">' + (s.contactFirst||'') + ' ' + (s.contactLast||'') + '<br><span style="color:#7a9ab8;">' + (s.contactEmail||'') + '</span></td>' +
+        '<td style="font-size:12px;">' + (s.hp ? s.hp+' HP' : '—') + '<br><span style="color:#7a9ab8;">' + (s.engHours ? s.engHours+' hrs' : '') + '</span></td>' +
+        '<td style="font-size:11px;color:#7a9ab8;">' + timeSince(s.submittedAt) + '</td>' +
+        '<td><div class="action-btns"><button class="btn-edit" onclick="openEdit(\'' + s.id + '\',\'seller\')">Edit</button><button class="btn-delete" onclick="confirmDelete(\'' + s.id + '\',\'seller\',\'' + (s.year+' '+s.make+' '+s.model).replace(/'/g,'') + '\')">Delete</button></div></td>';
+      body.appendChild(tr);
+    });
+  } else {
+    head.innerHTML = '<tr><th>#</th><th>Looking For</th><th>Name</th><th>Budget</th><th>Location</th><th>Contact</th><th>Timeline</th><th>Posted</th><th>Actions</th></tr>';
+    body.innerHTML = '';
+    if (d.buyers.length === 0) {
+      body.innerHTML = '<tr class="empty-row"><td colspan="9">No buyer requests yet.</td></tr>';
+      return;
+    }
+    d.buyers.forEach(function(b, i) {
+      var types = (b.boatTypes||[]).join(', ') || '—';
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td style="color:#7a9ab8;font-size:11px;">' + (i+1) + '</td>' +
+        '<td><span class="pill buyer">' + types + '</span></td>' +
+        '<td><strong style="color:#122c51;">' + (b.firstName||'') + ' ' + (b.lastName||'') + '</strong><br><span style="font-size:11px;color:#7a9ab8;">' + (b.primaryUse||'') + '</span></td>' +
+        '<td style="font-size:12px;">' + ((b.priceMin||b.priceMax) ? fmt(b.priceMin)+' – '+fmt(b.priceMax) : 'Flexible') + '</td>' +
+        '<td style="font-size:12px;">' + (b.location||'—') + '</td>' +
+        '<td style="font-size:12px;">' + (b.email||'—') + '<br><span style="color:#7a9ab8;">' + (b.phone||'') + '</span></td>' +
+        '<td style="font-size:12px;">' + (b.timeline||'—') + '</td>' +
+        '<td style="font-size:11px;color:#7a9ab8;">' + timeSince(b.submittedAt) + '</td>' +
+        '<td><div class="action-btns"><button class="btn-edit" onclick="openEdit(\'' + b.id + '\',\'buyer\')">Edit</button><button class="btn-delete" onclick="confirmDelete(\'' + b.id + '\',\'buyer\',\'' + (b.firstName+' '+b.lastName).replace(/'/g,'') + '\')">Delete</button></div></td>';
+      body.appendChild(tr);
+    });
+  }
+}
+
+function openEdit(id, type) {
+  var d = getData();
+  var list = type === 'seller' ? d.sellers : d.buyers;
+  var rec = list.find(function(r){ return r.id === id; });
+  if (!rec) return;
+  editingRecord = { id: id, type: type };
+
+  document.getElementById('modal-title').textContent = type === 'seller'
+    ? 'Edit Seller Listing — ' + (rec.year||'') + ' ' + (rec.make||'') + ' ' + (rec.model||'')
+    : 'Edit Buyer Request — ' + (rec.firstName||'') + ' ' + (rec.lastName||'');
+
+  var f = document.getElementById('modal-form');
+
+  if (type === 'seller') {
+    f.innerHTML =
+      '<div class="edit-grid">' +
+      field('boatType','Boat Type',rec.boatType,'text') +
+      field('make','Make / Brand',rec.make,'text') +
+      field('model','Model',rec.model,'text') +
+      field('year','Year',rec.year,'number') +
+      field('length','Length (ft)',rec.length,'number') +
+      field('beam','Beam (ft)',rec.beam,'number') +
+      field('hull','Hull Material',rec.hull,'text') +
+      field('hp','Horsepower',rec.hp,'number') +
+      field('engHours','Engine Hours',rec.engHours,'number') +
+      field('engBrand','Engine Brand',rec.engBrand,'text') +
+      field('price','Asking Price ($)',rec.price,'number') +
+      field('location','Location',rec.location,'text') +
+      field('contactFirst','First Name',rec.contactFirst,'text') +
+      field('contactLast','Last Name',rec.contactLast,'text') +
+      field('contactEmail','Email',rec.contactEmail,'text') +
+      field('contactPhone','Phone',rec.contactPhone,'text') +
+      '<div class="field-group full"><label class="fl">Seller Notes</label><textarea id="ef-notes" rows="3">' + esc(rec.notes||'') + '</textarea></div>' +
+      '</div>';
+  } else {
+    f.innerHTML =
+      '<div class="edit-grid">' +
+      field('firstName','First Name',rec.firstName,'text') +
+      field('lastName','Last Name',rec.lastName,'text') +
+      field('email','Email',rec.email,'text') +
+      field('phone','Phone',rec.phone,'text') +
+      field('location','Location',rec.location,'text') +
+      field('priceMin','Budget Min ($)',rec.priceMin,'number') +
+      field('priceMax','Budget Max ($)',rec.priceMax,'number') +
+      field('lenMin','Min Length (ft)',rec.lenMin,'number') +
+      field('lenMax','Max Length (ft)',rec.lenMax,'number') +
+      field('yrMin','Earliest Year',rec.yrMin,'number') +
+      field('yrMax','Latest Year',rec.yrMax,'number') +
+      field('hpMin','Min HP',rec.hpMin,'number') +
+      field('hrsMax','Max Engine Hours',rec.hrsMax,'number') +
+      field('timeline','Timeline',rec.timeline,'text') +
+      field('primaryUse','Primary Use',rec.primaryUse,'text') +
+      field('finance','Financing',rec.finance,'text') +
+      '<div class="field-group full"><label class="fl">Notes</label><textarea id="ef-notes" rows="3">' + esc(rec.notes||'') + '</textarea></div>' +
+      '</div>';
+  }
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function field(id, label, val, type) {
+  return '<div class="field-group"><label class="fl">' + label + '</label><input type="' + type + '" id="ef-' + id + '" value="' + esc(val||'') + '"></div>';
+}
+
+function esc(s) { return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function saveEdit() {
+  if (!editingRecord) return;
+  var id = editingRecord.id;
+  var type = editingRecord.type;
+
+  var updates = {};
+  var fields = type === 'seller'
+    ? ['boatType','make','model','year','length','beam','hull','hp','engHours','engBrand','price','location','contactFirst','contactLast','contactEmail','contactPhone']
+    : ['firstName','lastName','email','phone','location','priceMin','priceMax','lenMin','lenMax','yrMin','yrMax','hpMin','hrsMax','timeline','primaryUse','finance'];
+
+  fields.forEach(function(f) {
+    var el = document.getElementById('ef-' + f);
+    if (el) updates[f] = el.value;
+  });
+  var notesEl = document.getElementById('ef-notes');
+  if (notesEl) updates.notes = notesEl.value;
+
+  try {
+    var edits = JSON.parse(localStorage.getItem('adminEdits') || '{}');
+    edits[id] = Object.assign(edits[id] || {}, updates);
+    localStorage.setItem('adminEdits', JSON.stringify(edits));
+  } catch(e) {}
+
+  closeModal();
+  renderTable();
+  updateStats();
+  showToast('✓ Changes saved');
+}
+
+function confirmDelete(id, type, name) {
+  document.getElementById('del-desc').textContent = 'Delete "' + name + '"? This cannot be undone.';
+  var btn = document.getElementById('del-confirm-btn');
+  btn.onclick = function() { doDelete(id); };
+  document.getElementById('del-overlay').classList.add('open');
+}
+
+function doDelete(id) {
+  try {
+    var dels = JSON.parse(localStorage.getItem('adminDeleted') || '[]');
+    if (dels.indexOf(id) < 0) dels.push(id);
+    localStorage.setItem('adminDeleted', JSON.stringify(dels));
+  } catch(e) {}
+  document.getElementById('del-overlay').classList.remove('open');
+  renderTable();
+  updateStats();
+  showToast('🗑 Record deleted');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  editingRecord = null;
+}
+
+function overlayClick(e) {
+  if (e.target === e.currentTarget) {
+    e.currentTarget.classList.remove('open');
+    editingRecord = null;
+  }
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+function logout() {
+  try { localStorage.removeItem('boatMarketRole'); localStorage.removeItem('boatMarketAuth'); } catch(e){}
+  window.location.href = 'login.html';
+}
+
+// Init
+updateStats();
+renderTable();
+</script>
+</body>
+</html>

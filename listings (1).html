@@ -1,0 +1,853 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; background: #eff6ff; font-family: 'DM Sans', sans-serif; color: #1d3c6c; }
+
+  .nav-bar {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 1.5rem 1rem 0;
+    position: relative;
+    z-index: 10;
+  }
+  .nav-pill {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 7px 18px;
+    border-radius: 20px;
+    border: 1px solid rgba(92,145,211,0.3);
+    background: rgba(230,242,255,0.85);
+    color: #2a5080;
+    cursor: pointer;
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: all 0.18s;
+  }
+  .nav-pill:hover { background: #d6e8ff; border-color: #3b79cf; }
+  .nav-pill.active-nav { background: #3b79cf; color: #fff; border-color: #3b79cf; }
+
+  .page-wrap {
+    width: min(100%, 980px);
+    margin: 2rem auto;
+    padding: 0 1rem 3rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-section {
+    background: linear-gradient(180deg, #f9fbff 0%, #eef5ff 100%);
+    border-radius: 28px;
+    border: 1px solid rgba(94,146,215,0.18);
+    box-shadow: 0 20px 60px rgba(29,56,104,0.07);
+    padding: 2.5rem 2.5rem 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(88,136,214,0.12);
+    border: 1px solid rgba(88,136,214,0.26);
+    color: #24517e;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+
+  h1.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 600;
+    color: #122c51;
+    line-height: 1.15;
+    margin-bottom: 0.8rem;
+  }
+  h1.hero-title span { color: #3b79cf; }
+
+  .hero-sub {
+    font-size: 14px;
+    font-weight: 300;
+    color: #5b738f;
+    line-height: 1.7;
+    max-width: 520px;
+    margin-bottom: 1.5rem;
+  }
+
+  .cta-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .btn-primary {
+    background: #e5f0ff;
+    color: #154a82;
+    border: 1px solid #5a94d0;
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    text-decoration: none;
+    display: inline-block;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary:hover { background: #d6e8ff; border-color: #3b79cf; transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(92,145,211,0.3);
+    color: #3b79cf;
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.18s;
+  }
+  .btn-ghost:hover { background: rgba(59,121,207,0.07); border-color: #3b79cf; }
+
+  /* Stats */
+  .stats-row { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(126,200,227,0.15); }
+  .stat p:first-child { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #1d3c6c; font-weight: 600; }
+  .stat p:last-child { font-size: 12px; color: rgba(29,60,108,0.55); margin-top: 2px; }
+
+  /* Filters */
+  .filters-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-select {
+    background: #f6f9ff;
+    border: 1px solid rgba(92,145,211,0.3);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #1f3b68;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 28px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a7bb7' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+
+  .filter-select:focus { border-color: rgba(92,145,211,0.6); background-color: #eef4ff; }
+
+  .search-input {
+    flex: 1;
+    min-width: 200px;
+    background: #f6f9ff;
+    border: 1px solid rgba(92,145,211,0.3);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #1f3b68;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: rgba(92,145,211,0.6); background: #eef4ff; }
+  .search-input::placeholder { color: rgba(76,106,145,0.5); }
+
+  .tab-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(126,200,227,0.18);
+    padding-bottom: 0;
+  }
+  .tab-btn {
+    padding: 9px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4a7bb7;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.18s;
+  }
+  .tab-btn.active { color: #122c51; border-bottom-color: #3b79cf; }
+  .tab-btn:hover { color: #122c51; }
+
+  /* Listing Cards */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid rgba(94,146,215,0.14);
+    box-shadow: 0 8px 24px rgba(29,56,104,0.06);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(29,56,104,0.11); }
+
+  .card-img {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    background: linear-gradient(135deg, #d0e4ff 0%, #b8d4f0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-img-placeholder {
+    width: 100%;
+    height: 170px;
+    background: linear-gradient(135deg, #daeaff 0%, #c0d8f5 50%, #aac8e8 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .card-type-tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255,255,255,0.88);
+    border: 1px solid rgba(92,145,211,0.2);
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #24517e;
+    letter-spacing: 0.06em;
+  }
+
+  .card-buyer-tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(59,121,207,0.12);
+    border: 1px solid rgba(59,121,207,0.3);
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #154a82;
+    letter-spacing: 0.06em;
+  }
+
+  .new-tag {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #3b79cf;
+    color: #fff;
+    border-radius: 10px;
+    padding: 3px 9px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .card-body { padding: 1rem 1.1rem 1.2rem; }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #122c51;
+    margin-bottom: 3px;
+    line-height: 1.3;
+  }
+  .card-sub {
+    font-size: 12px;
+    color: #5b738f;
+    margin-bottom: 8px;
+  }
+  .card-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #154a82;
+    margin-bottom: 10px;
+  }
+  .card-specs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .spec-chip {
+    background: rgba(88,138,219,0.08);
+    border: 1px solid rgba(88,138,219,0.18);
+    border-radius: 10px;
+    padding: 3px 9px;
+    font-size: 11px;
+    color: #2a5080;
+  }
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+    border-top: 1px solid rgba(126,200,227,0.12);
+  }
+  .card-loc { font-size: 11px; color: #7a9ab8; }
+  .contact-btn {
+    background: #e5f0ff;
+    color: #154a82;
+    border: 1px solid rgba(92,145,211,0.4);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .contact-btn:hover { background: #d6e8ff; border-color: #3b79cf; }
+
+  /* Buyer request card */
+  .buyer-card-body { padding: 1rem 1.1rem 1.2rem; }
+  .buyer-wants { font-size: 12px; color: #5b738f; margin-bottom: 8px; line-height: 1.5; }
+  .buyer-budget { font-family: 'Playfair Display', serif; font-size: 1rem; color: #154a82; font-weight: 600; margin-bottom: 8px; }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #5b738f;
+  }
+  .empty-state p { font-size: 14px; margin-top: 0.5rem; }
+  .empty-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(18,44,81,0.35);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 30px 80px rgba(18,44,81,0.18);
+    padding: 2rem;
+    max-width: 520px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: fadeSlide 0.3s ease forwards;
+  }
+  @keyframes fadeSlide { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  .modal-close {
+    float: right;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #7a9ab8;
+    margin-top: -4px;
+    transition: color 0.15s;
+  }
+  .modal-close:hover { color: #122c51; }
+  .modal h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #122c51; margin-bottom: 0.3rem; }
+  .modal-price { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: #154a82; margin-bottom: 1rem; }
+  .detail-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .detail-chip { background: rgba(88,138,219,0.09); border: 1px solid rgba(88,138,219,0.2); border-radius: 10px; padding: 4px 11px; font-size: 12px; color: #2a5080; }
+  .modal-section { margin-bottom: 1rem; }
+  .modal-section-label { font-size: 11px; font-weight: 500; color: #4a7bb7; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+  .modal-section-val { font-size: 13px; color: #5b738f; line-height: 1.5; }
+  .modal-divider { height: 1px; background: rgba(126,200,227,0.15); margin: 1rem 0; }
+  .contact-info { background: #f0f7ff; border: 1px solid rgba(92,145,211,0.2); border-radius: 12px; padding: 1rem; }
+  .contact-info p { font-size: 13px; color: #1f3b68; margin-bottom: 4px; }
+  .contact-info p:last-child { margin-bottom: 0; }
+  .contact-info strong { color: #122c51; }
+
+  /* Match badge */
+  .match-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.25);
+    color: #065f46;
+    border-radius: 10px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+</style>
+
+<canvas id="ocean-bg" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+<script>
+(function(){
+  var canvas=document.getElementById('ocean-bg');
+  var ctx=canvas.getContext('2d');
+  var W,H;
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  var t=0;
+  function waveY(x,time,amp,freq,speed){return amp*Math.sin(freq*x+speed*time);}
+  function drawWaves(){
+    [[0.72,14,0.012,1.1,6,0.028,0.7,'rgba(126,185,230,0.22)','rgba(100,160,220,0.12)',0.6],
+     [0.78,10,0.018,-0.9,5,0.035,1.3,'rgba(100,165,220,0.18)','rgba(80,145,210,0.10)',0.7],
+     [0.84,8,0.022,1.5,4,0.04,-0.6,'rgba(80,155,215,0.20)','rgba(60,130,200,0.10)',0.78]
+    ].forEach(function(w){
+      ctx.beginPath();ctx.moveTo(0,H);
+      for(var x=0;x<=W;x+=4){ctx.lineTo(x,H*w[0]+waveY(x,t,w[1],w[2],w[3])+waveY(x,t,w[4],w[5],w[6]));}
+      ctx.lineTo(W,H);ctx.closePath();
+      var g=ctx.createLinearGradient(0,H*w[10],0,H);g.addColorStop(0,w[7]);g.addColorStop(1,w[8]);
+      ctx.fillStyle=g;ctx.fill();
+    });
+  }
+  function animate(){ctx.clearRect(0,0,W,H);t+=0.018;drawWaves();requestAnimationFrame(animate);}
+  animate();
+})();
+</script>
+
+<!-- Auth guard -->
+<script>try{if(!localStorage.getItem('boatMarketAuth'))window.location.href='login.html';}catch(e){}</script>
+<!-- Nav -->
+<div class="nav-bar">
+  <a class="nav-pill" href="seller.html">Sell a Boat</a>
+  <a class="nav-pill" href="buyer.html">Find a Boat</a>
+  <a class="nav-pill active-nav" href="listings.html">Browse Listings</a>
+  <span id="admin-nav-link" style="display:none;"><a class="nav-pill" href="admin.html" style="background:rgba(29,60,108,0.12);border-color:rgba(29,60,108,0.2);color:#1e4a7c;">⚓ Admin</a></span>
+  <a class="nav-pill" href="login.html" onclick="try{localStorage.removeItem('boatMarketAuth');localStorage.removeItem('boatMarketRole');}catch(e){}" style="background:rgba(226,75,74,0.07);border-color:rgba(226,75,74,0.2);color:#b83232;">Sign Out</a>
+</div>
+<script>try{if(localStorage.getItem('boatMarketRole')==='admin')document.getElementById('admin-nav-link').style.display='inline';}catch(e){}</script>
+
+<div class="page-wrap">
+  <!-- Hero -->
+  <div class="hero-section">
+    <div class="badge">Boat Marketplace</div>
+    <h1 class="hero-title">Boats for sale —<br><span>and buyers searching.</span></h1>
+    <p class="hero-sub">Browse seller listings below, or see active buyer requests waiting to be matched. Every connection starts here.</p>
+    <div class="cta-row">
+      <a class="btn-primary" href="seller.html">List My Boat</a>
+      <a class="btn-ghost" href="buyer.html">Submit a Search Request</a>
+    </div>
+    <div class="stats-row" id="stats-row">
+      <div class="stat"><p id="stat-listings">0</p><p>Boats Listed</p></div>
+      <div class="stat"><p id="stat-buyers">0</p><p>Active Buyers</p></div>
+      <div class="stat"><p id="stat-matches">—</p><p>Potential Matches</p></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-row">
+    <button class="tab-btn active" id="tab-listings" onclick="showTab('listings')">Boats for Sale</button>
+    <button class="tab-btn" id="tab-buyers" onclick="showTab('buyers')">Buyer Requests</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar" id="filters-bar">
+    <input class="search-input" id="search-input" type="text" placeholder="Search by make, model, type..." oninput="renderCards()">
+    <select class="filter-select" id="filter-type" onchange="renderCards()">
+      <option value="">All Types</option>
+      <option>Center Console</option>
+      <option>Bass Boat</option>
+      <option>Bowrider</option>
+      <option>Pontoon</option>
+      <option>Cabin Cruiser</option>
+      <option>Sailboat</option>
+      <option>Offshore / Sport Fish</option>
+      <option>Jet Boat</option>
+      <option>Tritoon</option>
+    </select>
+    <select class="filter-select" id="filter-price" onchange="renderCards()">
+      <option value="">Any Price</option>
+      <option value="0-25000">Under $25k</option>
+      <option value="25000-75000">$25k – $75k</option>
+      <option value="75000-150000">$75k – $150k</option>
+      <option value="150000-9999999">$150k+</option>
+    </select>
+    <select class="filter-select" id="filter-sort" onchange="renderCards()">
+      <option value="newest">Newest First</option>
+      <option value="price-asc">Price: Low → High</option>
+      <option value="price-desc">Price: High → Low</option>
+    </select>
+  </div>
+
+  <!-- Cards Grid -->
+  <div class="grid" id="cards-grid"></div>
+</div>
+
+<!-- Contact Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+// ─── Demo seed data (represents what real form submissions would produce) ───
+var DEMO_SELLERS = [
+  {
+    type:'seller', id:'s1',
+    boatType:'Center Console', make:'Boston Whaler', model:'Outrage 280',
+    year:2020, length:28, beam:9.5, hull:'Fiberglass', color:'White / blue stripe',
+    trailer:'No trailer', engines:'Twin', engBrand:'Mercury', hp:600, engYear:2020,
+    engHours:312, engType:'Outboard', electronics:['Garmin GPS','Fish Finder','VHF Radio','Radar','Chartplotter'],
+    amenities:['Bimini Top','Swim Platform','Anchor & Windlass','Rod Holders'],
+    price:189000, location:'Fort Lauderdale, FL', storage:'Marina / Slip',
+    title:'Clean title in hand', reason:'Upgrading',
+    notes:'Excellent offshore fishing machine. Full Garmin suite, T-top, live well. Always flushed, freshwater-stored. Sea trial available.',
+    contactFirst:'Michael', contactLast:'Torres', contactEmail:'m.torres@example.com',
+    contactPhone:'(954) 555-0192', contactPref:'Call', submittedAt: new Date(Date.now()-86400000*1).toISOString()
+  },
+  {
+    type:'seller', id:'s2',
+    boatType:'Pontoon', make:'Bennington', model:'22 SSRX',
+    year:2021, length:22, beam:8, hull:'Aluminum', color:'Champagne / grey deck',
+    trailer:'Yes, included', engines:'Single', engBrand:'Yamaha', hp:150, engYear:2021,
+    engHours:180, engType:'Outboard', electronics:['Garmin GPS','Stereo / Sound System','Depth Sounder'],
+    amenities:['Bimini Top','Swim Platform','Boarding Ladder','Cooler / Fridge'],
+    price:38500, location:'Lake Norman, NC', storage:'Freshwater Lake',
+    title:'Clean title in hand', reason:'Moving out of state',
+    notes:'Pristine freshwater boat. Never in salt. Trailer has new tires and bearings.',
+    contactFirst:'Sarah', contactLast:'Chen', contactEmail:'schen@example.com',
+    contactPhone:'(704) 555-0341', contactPref:'Text', submittedAt: new Date(Date.now()-86400000*3).toISOString()
+  },
+  {
+    type:'seller', id:'s3',
+    boatType:'Bass Boat', make:'Ranger', model:'Z521C',
+    year:2019, length:21, beam:8, hull:'Fiberglass', color:'Black / silver',
+    trailer:'Yes, included', engines:'Single', engBrand:'Mercury', hp:250, engYear:2019,
+    engHours:445, engType:'Outboard', electronics:['Humminbird GPS','Fish Finder','Side Imaging Sonar','Down Imaging'],
+    amenities:['Live Well','Rod Holders'],
+    price:42000, location:'Guntersville, AL', storage:'Driveway / Home',
+    title:'Clean title in hand', reason:'Health reasons',
+    notes:'Tournament-ready. Dual Humminbird Helix setup. New impeller 2024.',
+    contactFirst:'Jeff', contactLast:'Malone', contactEmail:'jmalone@example.com',
+    contactPhone:'(256) 555-0087', contactPref:'Call', submittedAt: new Date(Date.now()-86400000*5).toISOString()
+  },
+  {
+    type:'seller', id:'s4',
+    boatType:'Cabin Cruiser', make:'Sea Ray', model:'Sundancer 320',
+    year:2017, length:32, beam:10, hull:'Fiberglass', color:'White / platinum',
+    trailer:'No trailer', engines:'Twin', engBrand:'Mercruiser', hp:440, engYear:2017,
+    engHours:720, engType:'Stern Drive (I/O)', electronics:['Garmin GPS','Chartplotter','VHF Radio','Autopilot','Radar','Stereo / Sound System'],
+    amenities:['Cabin / Cuddy','Head / Bathroom','Galley / Kitchenette','Air Conditioning','Shore Power','Swim Platform','Boarding Ladder','Bimini Top'],
+    price:95000, location:'Annapolis, MD', storage:'Marina / Slip',
+    title:'Clean title in hand', reason:'Upgrading',
+    notes:'Meticulously maintained. Full service records. Sleeps 4 comfortably. Dock lines and fenders included.',
+    contactFirst:'Patricia', contactLast:'Monroe', contactEmail:'pat.monroe@example.com',
+    contactPhone:'(410) 555-0228', contactPref:'Email', submittedAt: new Date(Date.now()-86400000*7).toISOString()
+  },
+  {
+    type:'seller', id:'s5',
+    boatType:'Bowrider', make:'Chaparral', model:'21 SSi',
+    year:2022, length:21, beam:7.5, hull:'Fiberglass', color:'White / red accent',
+    trailer:'Yes, included', engines:'Single', engBrand:'MerCruiser', hp:220, engYear:2022,
+    engHours:95, engType:'Stern Drive (I/O)', electronics:['Depth Sounder','Stereo / Sound System'],
+    amenities:['Bimini Top','Swim Platform','Boarding Ladder'],
+    price:45000, location:'Austin, TX', storage:'Driveway / Home',
+    title:'Clean title in hand', reason:'Upgrading to larger boat',
+    notes:'Like new. Only used on Lake Travis. No salt exposure. Full factory warranty transferable.',
+    contactFirst:'Ryan', contactLast:'Davis', contactEmail:'ryan.d@example.com',
+    contactPhone:'(512) 555-0773', contactPref:'Text', submittedAt: new Date(Date.now()-86400000*2).toISOString()
+  }
+];
+
+var DEMO_BUYERS = [
+  {
+    type:'buyer', id:'b1',
+    boatTypes:['Center Console','Offshore / Sport Fish'], make:'Boston Whaler, Grady-White',
+    primaryUse:'Fishing', lenMin:24, lenMax:32, yrMin:2016, yrMax:2024,
+    hullPrefs:['Fiberglass'], trailerReq:'No preference',
+    engTypes:['Outboard'], hpMin:300, hpMax:600, hrsMax:500, engBrand:'',
+    mustHaves:['GPS / Chartplotter','Fish Finder','VHF Radio','Rod Holders','Live Well'],
+    priceMin:80000, priceMax:200000, finance:'Financing / loan', timeline:'1–3 months',
+    firstName:'James', lastName:'K.', email:'***@***.com', phone:'(***) ***-****',
+    location:'Miami, FL', contactPref:'Email',
+    notes:'Offshore tournament fishing. Must have T-top. Sea trial required.',
+    submittedAt: new Date(Date.now()-86400000*1).toISOString()
+  },
+  {
+    type:'buyer', id:'b2',
+    boatTypes:['Pontoon','Tritoon'], make:'',
+    primaryUse:'Family Fun', lenMin:20, lenMax:26, yrMin:2018, yrMax:2024,
+    hullPrefs:['Aluminum'], trailerReq:'Preferred but not required',
+    engTypes:['Outboard'], hpMin:100, hpMax:250, hrsMax:300, engBrand:'Yamaha',
+    mustHaves:['Bimini Top','Swim Platform','Stereo / Sound System'],
+    priceMin:30000, priceMax:65000, finance:'Paying cash', timeline:'Right now',
+    firstName:'Lisa', lastName:'M.', email:'***@***.com', phone:'(***) ***-****',
+    location:'Lake Michigan, IL', contactPref:'Text',
+    notes:'Family of 5. Freshwater use only. Would love a tritoon.',
+    submittedAt: new Date(Date.now()-86400000*2).toISOString()
+  },
+  {
+    type:'buyer', id:'b3',
+    boatTypes:['Bass Boat'], make:'Ranger, Nitro, Skeeter',
+    primaryUse:'Fishing', lenMin:18, lenMax:22, yrMin:2015, yrMax:2024,
+    hullPrefs:['Fiberglass'], trailerReq:'Yes, must include trailer',
+    engTypes:['Outboard'], hpMin:200, hpMax:300, hrsMax:600, engBrand:'',
+    mustHaves:['Fish Finder','Live Well','Rod Holders'],
+    priceMin:25000, priceMax:55000, finance:'Financing / loan', timeline:'1–3 months',
+    firstName:'Tom', lastName:'B.', email:'***@***.com', phone:'(***) ***-****',
+    location:'Tennessee', contactPref:'Call',
+    notes:'Tournament bass angler. Dual livewells preferred. Will travel for the right boat.',
+    submittedAt: new Date(Date.now()-86400000*4).toISOString()
+  }
+];
+
+// Load any real submissions from localStorage
+function loadAllData() {
+  var sellers = DEMO_SELLERS.slice();
+  var buyers = DEMO_BUYERS.slice();
+  try {
+    var ls = JSON.parse(localStorage.getItem('boatBuyerRequests') || '[]');
+    ls.forEach(function(r,i){ r.id = 'lb'+i; buyers.push(r); });
+  } catch(e){}
+  // Check for seller submissions from seller page (sellers would store in boatSellerListings)
+  try {
+    var ls2 = JSON.parse(localStorage.getItem('boatSellerListings') || '[]');
+    ls2.forEach(function(r,i){ r.id = 'ls'+i; sellers.push(r); });
+  } catch(e){}
+  return { sellers: sellers, buyers: buyers };
+}
+
+var currentTab = 'listings';
+var allData = loadAllData();
+
+function updateStats() {
+  document.getElementById('stat-listings').textContent = allData.sellers.length;
+  document.getElementById('stat-buyers').textContent = allData.buyers.length;
+  // Simple match count: overlap between buyer wants and seller types
+  var matches = 0;
+  allData.buyers.forEach(function(b) {
+    allData.sellers.forEach(function(s) {
+      var bTypes = b.boatTypes || [];
+      if (bTypes.indexOf(s.boatType) >= 0 || bTypes.indexOf('Open to anything') >= 0) matches++;
+    });
+  });
+  document.getElementById('stat-matches').textContent = matches;
+}
+
+function showTab(tab) {
+  currentTab = tab;
+  document.getElementById('tab-listings').classList.toggle('active', tab === 'listings');
+  document.getElementById('tab-buyers').classList.toggle('active', tab === 'buyers');
+  document.getElementById('filters-bar').style.display = tab === 'listings' ? 'flex' : 'none';
+  renderCards();
+}
+
+function fmt(n) {
+  if (!n) return '—';
+  return '$' + Number(n).toLocaleString();
+}
+
+function timeSince(iso) {
+  var ms = Date.now() - new Date(iso).getTime();
+  var days = Math.floor(ms/86400000);
+  if (days === 0) return 'Today';
+  if (days === 1) return '1 day ago';
+  return days + ' days ago';
+}
+
+function isNew(iso) {
+  return (Date.now() - new Date(iso).getTime()) < 86400000 * 2;
+}
+
+function renderCards() {
+  var grid = document.getElementById('cards-grid');
+  grid.innerHTML = '';
+
+  if (currentTab === 'listings') {
+    var q = (document.getElementById('search-input').value || '').toLowerCase();
+    var typeF = document.getElementById('filter-type').value;
+    var priceF = document.getElementById('filter-price').value;
+    var sortF = document.getElementById('filter-sort').value;
+
+    var list = allData.sellers.filter(function(s) {
+      if (q) {
+        var hay = [s.make, s.model, s.boatType, s.location].join(' ').toLowerCase();
+        if (hay.indexOf(q) < 0) return false;
+      }
+      if (typeF && s.boatType !== typeF) return false;
+      if (priceF) {
+        var parts = priceF.split('-').map(Number);
+        var p = Number(s.price) || 0;
+        if (p < parts[0] || p > parts[1]) return false;
+      }
+      return true;
+    });
+
+    if (sortF === 'price-asc') list.sort(function(a,b){ return (a.price||0)-(b.price||0); });
+    else if (sortF === 'price-desc') list.sort(function(a,b){ return (b.price||0)-(a.price||0); });
+    else list.sort(function(a,b){ return new Date(b.submittedAt)-new Date(a.submittedAt); });
+
+    if (list.length === 0) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon">⚓</div><p style="font-family:\'Playfair Display\',serif;font-size:1.1rem;color:#122c51;">No listings found</p><p>Try adjusting your filters or <a href="seller.html" style="color:#3b79cf;">be the first to list</a>.</p></div>';
+      return;
+    }
+
+    list.forEach(function(s) {
+      var card = document.createElement('div');
+      card.className = 'card';
+      card.onclick = function(){ openSellerModal(s); };
+      card.innerHTML =
+        '<div class="card-img-placeholder">' +
+          '<svg width="60" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" opacity="0.35">' +
+            '<path d="M10 42 C10 42 20 30 40 30 C60 30 70 42 70 42 L65 48 L15 48 Z" fill="#3b79cf"/>' +
+            '<line x1="40" y1="30" x2="40" y2="10" stroke="#2a5c96" stroke-width="2"/>' +
+            '<path d="M40 11 L58 28 L40 30 Z" fill="rgba(200,225,255,0.8)"/>' +
+            '<path d="M40 13 L25 30 L40 30 Z" fill="rgba(180,210,245,0.65)"/>' +
+          '</svg>' +
+          '<div class="card-type-tag">' + s.boatType + '</div>' +
+          (isNew(s.submittedAt) ? '<div class="new-tag">NEW</div>' : '') +
+        '</div>' +
+        '<div class="card-body">' +
+          '<p class="card-title">' + s.year + ' ' + (s.make||'') + ' ' + (s.model||'') + '</p>' +
+          '<p class="card-sub">' + timeSince(s.submittedAt) + (s.location ? ' &nbsp;·&nbsp; ' + s.location : '') + '</p>' +
+          '<p class="card-price">' + fmt(s.price) + '</p>' +
+          '<div class="card-specs">' +
+            (s.length ? '<span class="spec-chip">' + s.length + ' ft</span>' : '') +
+            (s.engines ? '<span class="spec-chip">' + s.engines + '</span>' : '') +
+            (s.hp ? '<span class="spec-chip">' + s.hp + ' HP</span>' : '') +
+            (s.engHours ? '<span class="spec-chip">' + s.engHours + ' hrs</span>' : '') +
+          '</div>' +
+          '<div class="card-footer">' +
+            '<span class="card-loc">📍 ' + (s.location || '—') + '</span>' +
+            '<button class="contact-btn" onclick="event.stopPropagation();openSellerModal(' + JSON.stringify(s).replace(/'/g,"\\'") + ')">View Details</button>' +
+          '</div>' +
+        '</div>';
+      grid.appendChild(card);
+    });
+
+  } else {
+    // Buyer requests
+    if (allData.buyers.length === 0) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon">🔍</div><p style="font-family:\'Playfair Display\',serif;font-size:1.1rem;color:#122c51;">No buyer requests yet</p><p>Know someone looking for a boat? <a href="buyer.html" style="color:#3b79cf;">They can post here</a>.</p></div>';
+      return;
+    }
+    allData.buyers.sort(function(a,b){ return new Date(b.submittedAt)-new Date(a.submittedAt); });
+    allData.buyers.forEach(function(b) {
+      var card = document.createElement('div');
+      card.className = 'card';
+      card.onclick = function(){ openBuyerModal(b); };
+      var types = (b.boatTypes||[]).join(', ') || 'Any type';
+      var budget = (b.priceMin || b.priceMax) ? fmt(b.priceMin) + ' – ' + fmt(b.priceMax) : 'Flexible budget';
+      card.innerHTML =
+        '<div class="card-img-placeholder" style="height:100px;background:linear-gradient(135deg,#e8f3ff,#d0e4f8);">' +
+          '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#3b79cf" stroke-width="1.5" opacity="0.5">' +
+            '<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/>' +
+          '</svg>' +
+          '<div class="card-buyer-tag">Buyer Request</div>' +
+          (isNew(b.submittedAt) ? '<div class="new-tag">NEW</div>' : '') +
+        '</div>' +
+        '<div class="buyer-card-body">' +
+          '<p class="card-title">' + b.firstName + ' ' + b.lastName + '</p>' +
+          '<p class="card-sub">' + timeSince(b.submittedAt) + (b.location ? ' &nbsp;·&nbsp; ' + b.location : '') + '</p>' +
+          '<p class="buyer-budget">' + budget + '</p>' +
+          '<p class="buyer-wants">Looking for: <strong>' + types + '</strong></p>' +
+          (b.primaryUse ? '<p class="buyer-wants">Use: ' + b.primaryUse + '</p>' : '') +
+          '<div class="card-specs">' +
+            (b.lenMin || b.lenMax ? '<span class="spec-chip">' + (b.lenMin||'?') + '–' + (b.lenMax||'?') + ' ft</span>' : '') +
+            (b.yrMin ? '<span class="spec-chip">' + b.yrMin + '+</span>' : '') +
+            (b.timeline ? '<span class="spec-chip">' + b.timeline + '</span>' : '') +
+          '</div>' +
+          '<div class="card-footer">' +
+            '<span class="card-loc">📍 ' + (b.location||'—') + '</span>' +
+            '<button class="contact-btn" onclick="event.stopPropagation();openBuyerModal(' + JSON.stringify(b).replace(/'/g,"\\'") + ')">See Details</button>' +
+          '</div>' +
+        '</div>';
+      grid.appendChild(card);
+    });
+  }
+}
+
+function openSellerModal(s) {
+  var m = document.getElementById('modal-content');
+  var elec = (s.electronics||[]).join(', ') || '—';
+  var amen = (s.amenities||[]).join(', ') || '—';
+  m.innerHTML =
+    '<button class="modal-close" onclick="document.getElementById(\'modal-overlay\').classList.remove(\'open\')">×</button>' +
+    '<div class="badge" style="margin-bottom:0.6rem;">' + s.boatType + '</div>' +
+    '<h3>' + s.year + ' ' + (s.make||'') + ' ' + (s.model||'') + '</h3>' +
+    '<p class="modal-price">' + fmt(s.price) + '</p>' +
+    '<div class="detail-row">' +
+      (s.length ? '<span class="detail-chip">' + s.length + ' ft</span>' : '') +
+      (s.beam ? '<span class="detail-chip">Beam: ' + s.beam + 'ft</span>' : '') +
+      (s.hull ? '<span class="detail-chip">' + s.hull + '</span>' : '') +
+      (s.engines ? '<span class="detail-chip">' + s.engines + ' engine(s)</span>' : '') +
+      (s.hp ? '<span class="detail-chip">' + s.hp + ' HP</span>' : '') +
+      (s.engHours ? '<span class="detail-chip">' + s.engHours + ' hrs</span>' : '') +
+    '</div>' +
+    '<div class="modal-divider"></div>' +
+    '<div class="modal-section"><p class="modal-section-label">Engine</p><p class="modal-section-val">' + [s.engines, s.engBrand, s.engType, s.engYear ? 'Year '+s.engYear : ''].filter(Boolean).join(' · ') + '</p></div>' +
+    '<div class="modal-section"><p class="modal-section-label">Electronics</p><p class="modal-section-val">' + elec + '</p></div>' +
+    '<div class="modal-section"><p class="modal-section-label">Amenities</p><p class="modal-section-val">' + amen + '</p></div>' +
+    '<div class="modal-section"><p class="modal-section-label">Storage & Title</p><p class="modal-section-val">' + [s.storage, s.title].filter(Boolean).join(' · ') + '</p></div>' +
+    (s.notes ? '<div class="modal-section"><p class="modal-section-label">Seller Notes</p><p class="modal-section-val">' + s.notes + '</p></div>' : '') +
+    '<div class="modal-divider"></div>' +
+    '<div class="contact-info">' +
+      '<p><strong>Contact</strong></p>' +
+      '<p>' + (s.contactFirst||'') + ' ' + (s.contactLast||'') + ' &nbsp;·&nbsp; Prefers: ' + (s.contactPref||'—') + '</p>' +
+      '<p>📧 ' + (s.contactEmail||'—') + '</p>' +
+      '<p>📞 ' + (s.contactPhone||'—') + '</p>' +
+      '<p style="font-size:11px;color:#7a9ab8;margin-top:6px;">📍 ' + (s.location||'—') + ' &nbsp;·&nbsp; Listed ' + timeSince(s.submittedAt) + '</p>' +
+    '</div>';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function openBuyerModal(b) {
+  var m = document.getElementById('modal-content');
+  var types = (b.boatTypes||[]).join(', ') || 'Any';
+  var mustH = (b.mustHaves||[]).join(', ') || '—';
+  var engT = (b.engTypes||[]).join(', ') || '—';
+  m.innerHTML =
+    '<button class="modal-close" onclick="document.getElementById(\'modal-overlay\').classList.remove(\'open\')">×</button>' +
+    '<div class="badge" style="margin-bottom:0.6rem;background:rgba(59,121,207,0.1);border-color:rgba(59,121,207,0.25);">Buyer Request</div>' +
+    '<h3>' + b.firstName + ' ' + b.lastName + '</h3>' +
+    '<p class="modal-price">' + ((b.priceMin || b.priceMax) ? fmt(b.priceMin) + ' – ' + fmt(b.priceMax) : 'Flexible budget') + '</p>' +
+    '<div class="modal-divider"></div>' +
+    '<div class="modal-section"><p class="modal-section-label">Boat Types</p><p class="modal-section-val">' + types + '</p></div>' +
+    (b.primaryUse ? '<div class="modal-section"><p class="modal-section-label">Primary Use</p><p class="modal-section-val">' + b.primaryUse + '</p></div>' : '') +
+    '<div class="modal-section"><p class="modal-section-label">Size & Year</p><p class="modal-section-val">' + [(b.lenMin||b.lenMax ? (b.lenMin||'any')+'–'+(b.lenMax||'any')+' ft' : null), (b.yrMin ? b.yrMin+'+' : null)].filter(Boolean).join(' · ') + '</p></div>' +
+    '<div class="modal-section"><p class="modal-section-label">Engine Preference</p><p class="modal-section-val">' + [engT, (b.hpMin ? b.hpMin+' HP min' : null), (b.hrsMax ? 'Max '+b.hrsMax+' hrs' : null)].filter(Boolean).join(' · ') + '</p></div>' +
+    '<div class="modal-section"><p class="modal-section-label">Must-Have Features</p><p class="modal-section-val">' + mustH + '</p></div>' +
+    '<div class="modal-section"><p class="modal-section-label">Timeline</p><p class="modal-section-val">' + (b.timeline||'—') + ' &nbsp;·&nbsp; ' + (b.finance||'—') + '</p></div>' +
+    (b.notes ? '<div class="modal-section"><p class="modal-section-label">Additional Notes</p><p class="modal-section-val">' + b.notes + '</p></div>' : '') +
+    '<div class="modal-divider"></div>' +
+    '<div class="contact-info">' +
+      '<p><strong>Contact This Buyer</strong></p>' +
+      '<p>Prefers: ' + (b.contactPref||'—') + '</p>' +
+      '<p>📧 ' + (b.email||'—') + '</p>' +
+      '<p>📞 ' + (b.phone||'—') + '</p>' +
+      '<p style="font-size:11px;color:#7a9ab8;margin-top:6px;">📍 ' + (b.location||'—') + ' &nbsp;·&nbsp; Posted ' + timeSince(b.submittedAt) + '</p>' +
+    '</div>';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-overlay')) {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+}
+
+// Init
+updateStats();
+renderCards();
+</script>
